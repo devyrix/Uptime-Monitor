@@ -1,0 +1,8 @@
+services:
+  uptime-monitor:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      # config di-mount read-only: ganti target TANPA rebuild image
+      - ./targets.yaml:/app/targets.yaml:ro
