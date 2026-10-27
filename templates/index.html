@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="refresh" content="5">
   <title>Uptime Monitor</title>
   <style>
     * { box-sizing: border-box; }
@@ -34,7 +35,7 @@
 </head>
 <body>
   <h1>Uptime Monitor</h1>
-  <p class="sub">Halaman tidak auto-refresh — tekan refresh browser untuk status terbaru.</p>
+  <p class="sub">Auto-refresh tiap 5 detik.</p>
 
   {{range .Targets}}
   <div class="card {{if .Up}}up{{else}}down{{end}}">
