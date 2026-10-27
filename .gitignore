@@ -1,0 +1,6 @@
+# binary hasil build
+uptime-monitor
+*.out
+
+# OS / editor
+.DS_Store
