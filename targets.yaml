@@ -1,0 +1,14 @@
+# jeda antar pengecekan per target
+interval: 5s
+# batas waktu tiap HTTP request
+timeout: 3s
+# jumlah hasil terakhir yang disimpan per target
+history: 20
+
+targets:
+  - name: Google
+    url: https://www.google.com
+  - name: GitHub API
+    url: https://api.github.com
+  - name: Localhost (pasti DOWN, untuk demo)
+    url: http://localhost:9999
