@@ -4,54 +4,227 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="refresh" content="5">
+  <meta name="color-scheme" content="light dark">
   <title>Uptime Monitor</title>
   <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f6f7f9;
+      --surface: #ffffff;
+      --border: #e4e7ec;
+      --text: #14181f;
+      --muted: #5d6b82;
+      --faint: #8a94a6;
+      --up: #15803d;
+      --up-bg: #e9f7ee;
+      --up-border: #c3e7d1;
+      --down: #b42318;
+      --down-bg: #fdeceb;
+      --down-border: #f3c8c3;
+      --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0b0e14;
+        --surface: #141922;
+        --border: #232a36;
+        --text: #e8edf5;
+        --muted: #98a2b3;
+        --faint: #667085;
+        --up: #4ade80;
+        --up-bg: #0f2a1a;
+        --up-border: #1d4a2d;
+        --down: #f87171;
+        --down-bg: #2c1214;
+        --down-border: #5a2326;
+      }
+    }
+
     * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
     body {
-      font-family: system-ui, -apple-system, sans-serif;
-      max-width: 720px; margin: 2rem auto; padding: 0 1rem;
-      background: #0f172a; color: #e2e8f0;
+      margin: 0;
+      padding: 40px 20px 64px;
+      background: var(--bg);
+      color: var(--text);
+      font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     }
-    h1 { font-size: 1.5rem; }
-    .sub { color: #64748b; font-size: .9rem; margin-top: -.5rem; }
+    main { max-width: 640px; margin: 0 auto; }
+
+    header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 19px;
+      font-weight: 600;
+      letter-spacing: -0.015em;
+    }
+    .refresh {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--faint);
+      white-space: nowrap;
+    }
+    .refresh::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--up);
+    }
+
+    .summary {
+      margin: 4px 0 24px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .summary strong {
+      color: var(--text);
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+    .summary .bad { color: var(--down); }
+
+    ul.targets {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
     .card {
-      background: #1e293b; border-radius: 8px; padding: 1rem 1.25rem;
-      margin: 1rem 0; border-left: 6px solid #64748b;
+      padding: 14px 16px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      transition: border-color 150ms var(--ease-out);
     }
-    .card.up   { border-left-color: #22c55e; }
-    .card.down { border-left-color: #ef4444; }
-    .card h2 { font-size: 1.05rem; margin: 0; display: flex; align-items: center; gap: .5rem; }
-    .badge { font-size: .7rem; font-weight: 700; padding: .15rem .55rem; border-radius: 999px; color: #fff; }
-    .badge.up   { background: #22c55e; }
-    .badge.down { background: #ef4444; }
-    .url  { color: #94a3b8; font-size: .85rem; margin: .35rem 0; word-break: break-all; }
-    .meta { font-size: .85rem; color: #cbd5e1; margin: .35rem 0; }
-    .history { display: flex; gap: 3px; margin-top: .5rem; align-items: center; min-height: 14px; }
-    .dot  { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
-    .dot.up   { background: #22c55e; }
-    .dot.down { background: #ef4444; }
-    .muted { color: #64748b; font-size: .85rem; }
+    @media (hover: hover) and (pointer: fine) {
+      .card:hover { border-color: var(--faint); }
+    }
+    .row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .name {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+    .url {
+      margin: 2px 0 0;
+      font-size: 12px;
+      color: var(--faint);
+      word-break: break-all;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 9px 3px 8px;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+    .pill::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+    .pill.up   { color: var(--up);   background: var(--up-bg);   border-color: var(--up-border); }
+    .pill.down { color: var(--down); background: var(--down-bg); border-color: var(--down-border); }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 14px;
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+    .meta .k { color: var(--faint); margin-right: 4px; }
+
+    .history {
+      display: flex;
+      justify-content: flex-end;
+      align-items: flex-end;
+      gap: 3px;
+      height: 18px;
+      margin-top: 12px;
+    }
+    .bar {
+      flex: 0 0 8px;
+      height: 100%;
+      border-radius: 2px;
+      background: var(--border);
+    }
+    .bar.up   { background: var(--up); }
+    .bar.down { background: var(--down); }
+    .empty { font-size: 12px; color: var(--faint); }
+
+    footer {
+      margin-top: 28px;
+      font-size: 12px;
+      color: var(--faint);
+    }
+
+    @media (max-width: 420px) {
+      body { padding: 24px 14px 48px; }
+      .row { flex-direction: column; gap: 8px; }
+      .pill { align-self: flex-start; }
+    }
   </style>
 </head>
 <body>
-  <h1>Uptime Monitor</h1>
-  <p class="sub">Auto-refresh tiap 5 detik.</p>
+<main>
+  <header>
+    <h1>Uptime Monitor</h1>
+    <span class="refresh">auto 5s</span>
+  </header>
 
-  {{range .Targets}}
-  <div class="card {{if .Up}}up{{else}}down{{end}}">
-    <h2>
-      {{.Name}}
-      {{if .Up}}<span class="badge up">UP</span>{{else}}<span class="badge down">DOWN</span>{{end}}
-    </h2>
-    <p class="url">{{.URL}}</p>
-    <p class="meta">
-      Latency: {{.LastMS}} ms · Dicek: {{.CheckedAt.Format "15:04:05"}}
-    </p>
-    <div class="history">
-      {{range .History}}<span class="dot {{if .Up}}up{{else}}down{{end}}" title="{{.MS}} ms"></span>
-      {{else}}<span class="muted">belum ada data</span>{{end}}
-    </div>
-  </div>
-  {{end}}
+  <p class="summary">
+    <strong>{{.UpCount}}/{{.Total}}</strong> layanan UP
+    {{- if .DownCount}} · <span class="bad">{{.DownCount}} DOWN</span>{{end}}
+  </p>
+
+  <ul class="targets">
+    {{range .Targets}}
+    <li class="card">
+      <div class="row">
+        <div>
+          <h2 class="name">{{.Name}}</h2>
+          <p class="url">{{.URL}}</p>
+        </div>
+        <span class="pill {{if .Up}}up{{else}}down{{end}}">{{if .Up}}UP{{else}}DOWN{{end}}</span>
+      </div>
+      <div class="meta">
+        <span><span class="k">latency</span>{{if .LastMS}}{{.LastMS}} ms{{else}}—{{end}}</span>
+        <span><span class="k">cek terakhir</span>{{.CheckedAt.Format "15:04:05"}}</span>
+      </div>
+      <div class="history">
+        {{range .History}}<span class="bar {{if .Up}}up{{else}}down{{end}}" title="{{.MS}} ms"></span>{{else}}<span class="empty">belum ada data</span>{{end}}
+      </div>
+    </li>
+    {{end}}
+  </ul>
+
+  <footer>Data disimpan di memori — riwayat hilang saat aplikasi restart.</footer>
+</main>
 </body>
 </html>

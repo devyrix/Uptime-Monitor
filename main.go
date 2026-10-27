@@ -35,7 +35,19 @@ func main() {
 	app := fiber.New(fiber.Config{Views: engine})
 
 	app.Get("/", func(c *fiber.Ctx) error {
-		return c.Render("index", fiber.Map{"Targets": store.Snapshot()})
+		targets := store.Snapshot()
+		up := 0
+		for _, t := range targets {
+			if t.Up {
+				up++
+			}
+		}
+		return c.Render("index", fiber.Map{
+			"Targets":   targets,
+			"UpCount":   up,
+			"DownCount": len(targets) - up,
+			"Total":     len(targets),
+		})
 	})
 	app.Get("/api/status", func(c *fiber.Ctx) error {
 		return c.JSON(store.Snapshot())
