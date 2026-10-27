@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Uptime Monitor</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 720px; margin: 2rem auto; padding: 0 1rem;
+      background: #0f172a; color: #e2e8f0;
+    }
+    h1 { font-size: 1.5rem; }
+    .sub { color: #64748b; font-size: .9rem; margin-top: -.5rem; }
+    .card {
+      background: #1e293b; border-radius: 8px; padding: 1rem 1.25rem;
+      margin: 1rem 0; border-left: 6px solid #64748b;
+    }
+    .card.up   { border-left-color: #22c55e; }
+    .card.down { border-left-color: #ef4444; }
+    .card h2 { font-size: 1.05rem; margin: 0; display: flex; align-items: center; gap: .5rem; }
+    .badge { font-size: .7rem; font-weight: 700; padding: .15rem .55rem; border-radius: 999px; color: #fff; }
+    .badge.up   { background: #22c55e; }
+    .badge.down { background: #ef4444; }
+    .url  { color: #94a3b8; font-size: .85rem; margin: .35rem 0; word-break: break-all; }
+    .meta { font-size: .85rem; color: #cbd5e1; margin: .35rem 0; }
+    .history { display: flex; gap: 3px; margin-top: .5rem; align-items: center; min-height: 14px; }
+    .dot  { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+    .dot.up   { background: #22c55e; }
+    .dot.down { background: #ef4444; }
+    .muted { color: #64748b; font-size: .85rem; }
+  </style>
+</head>
+<body>
+  <h1>Uptime Monitor</h1>
+  <p class="sub">Halaman tidak auto-refresh — tekan refresh browser untuk status terbaru.</p>
+
+  {{range .Targets}}
+  <div class="card {{if .Up}}up{{else}}down{{end}}">
+    <h2>
+      {{.Name}}
+      {{if .Up}}<span class="badge up">UP</span>{{else}}<span class="badge down">DOWN</span>{{end}}
+    </h2>
+    <p class="url">{{.URL}}</p>
+    <p class="meta">
+      Latency: {{.LastMS}} ms · Dicek: {{.CheckedAt.Format "15:04:05"}}
+    </p>
+    <div class="history">
+      {{range .History}}<span class="dot {{if .Up}}up{{else}}down{{end}}" title="{{.MS}} ms"></span>
+      {{else}}<span class="muted">belum ada data</span>{{end}}
+    </div>
+  </div>
+  {{end}}
+</body>
+</html>
